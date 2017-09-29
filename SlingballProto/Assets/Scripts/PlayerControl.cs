@@ -4,26 +4,36 @@ using UnityEngine;
 
 public class PlayerControl : MonoBehaviour {
 
-    public float speed = 3f;
-    public float turnSpeed = 3f;
+    public float speed = 45f;
+    public float turnSpeed = 1f;
     public float maxVel = 100;
+    public float levelRangeMin = 10;
+    public float levelRangeHalf = 180;
+
     private Rigidbody rigBody;
+
 
     private float pitch;
     private float yaw;
+
 
 	void Awake () {
         rigBody = GetComponent<Rigidbody>();
 	}
 	
 	void FixedUpdate () {
-
+        
         pitch = Input.GetAxis("Horizontal");
         yaw = Input.GetAxis("Vertical");
+        float roll = 0;
+        if(Input.GetKey(KeyCode.E))
+        {
+            roll = 1;
+        }
 
-        rigBody.AddRelativeTorque(yaw * turnSpeed, pitch * turnSpeed, 0);
+        rigBody.AddRelativeTorque(yaw * turnSpeed, pitch * turnSpeed, roll * turnSpeed);
 
-        if(Input.GetMouseButton(0))
+        if(Input.GetButton("Fire1"))
         {
             if (rigBody.velocity.magnitude <= maxVel)
             {
@@ -31,7 +41,8 @@ public class PlayerControl : MonoBehaviour {
             }
         }
 
-        //Level out
-      
+        Debug.Log("Speed:" + rigBody.velocity.magnitude);
+
+    
     }
 }

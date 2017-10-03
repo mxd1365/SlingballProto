@@ -2,17 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent (typeof(Rigidbody))]
 public class PlayerControl : MonoBehaviour {
-
-    public float speed = 45f;
-    public float turnSpeed = 1f;
-    public float maxVel = 100;
-    public float levelRangeMin = 10;
-    public float levelRangeHalf = 180;
 
     private Rigidbody rigBody;
 
-
+    public float rotSpeedMax = 10.0f;
+    public float rotSpeedMin = .2f;
+    public float thrust = 10f;
     private float pitch;
     private float yaw;
 
@@ -22,27 +19,25 @@ public class PlayerControl : MonoBehaviour {
 	}
 	
 	void FixedUpdate () {
-        
-        pitch = Input.GetAxis("Horizontal");
-        yaw = Input.GetAxis("Vertical");
-        float roll = 0;
-        if(Input.GetKey(KeyCode.E))
+
+        yaw = Input.GetAxis("Horizontal");
+        pitch = Input.GetAxis("Vertical");
+        if(Input.GetButton("Thrust"))
         {
-            roll = 1;
+            rigBody.AddRelativeForce(0f, 0f, thrust);
         }
+        Debug.Log(pitch);
 
-        rigBody.AddRelativeTorque(yaw * turnSpeed, pitch * turnSpeed, roll * turnSpeed);
+        rigBody.AddRelativeTorque(pitch, yaw, 0);
 
-        if(Input.GetButton("Fire1"))
+        if(pitch == 0 && yaw == 0)
         {
-            if (rigBody.velocity.magnitude <= maxVel)
-            {
-                rigBody.AddRelativeForce(0, 0, speed);
-            }
+            float rotSpeed = Vector3.Angle(transform.up, Vector3.up);
+            rotSpeed = (rotSpeed / 180f) * rotSpeedMax;
+            rotSpeed = Mathf.Clamp(rotSpeed, rotSpeedMin, rotSpeedMax);
+            rigBody.rotation =  Quaternion.RotateTowards(rigBody.rotation, Quaternion.LookRotation(transform.forward, Vector3.up), rotSpeed);
+
         }
-
-        Debug.Log("Speed:" + rigBody.velocity.magnitude);
-
     
     }
 }

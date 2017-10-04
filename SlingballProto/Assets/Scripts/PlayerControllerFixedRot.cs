@@ -10,6 +10,9 @@ public class PlayerControllerFixedRot : MonoBehaviour {
     public float thrustSpeed = 1000f;
     public float airBrakeDrag = 2f;
     public float floatDrag = 0f;
+    public float maxSpeed = 1000f;
+
+    public float jukeStrength = 100f;
 
 	// Use this for initialization
 	void Awake () {
@@ -25,7 +28,7 @@ public class PlayerControllerFixedRot : MonoBehaviour {
         
         Quaternion curRot = rigBody.rotation;
         Quaternion target = Quaternion.Euler(curRot.eulerAngles.x + (pitch * rotSpeed * Time.fixedDeltaTime), curRot.eulerAngles.y + (yaw * rotSpeed * Time.fixedDeltaTime), curRot.eulerAngles.z);
-        Debug.Log(target);
+        
         rigBody.MoveRotation(target);
 
         if(Input.GetButton("Thrust"))
@@ -42,5 +45,26 @@ public class PlayerControllerFixedRot : MonoBehaviour {
             rigBody.drag = floatDrag;
         }
         
+        if(Input.GetButtonDown("JukeRight"))
+        {
+            rigBody.AddRelativeForce(jukeStrength, 0f, 0f);
+        }
+
+        if(Input.GetButtonDown("JukeLeft"))
+        {
+            rigBody.AddRelativeForce(-jukeStrength, 0f, 0f);
+        }
+
+        //slow down
+        float speed = rigBody.velocity.magnitude;
+
+        Debug.Log("Speed:" + speed);
+        if(speed > maxSpeed)
+        {
+            float brakeSpeed = speed - maxSpeed;
+            Vector3 normVelocity = rigBody.velocity.normalized;
+            Vector3 brakeVelocity = -(normVelocity * brakeSpeed);
+            rigBody.AddForce(brakeVelocity);
+        }
 	}
 }
